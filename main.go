@@ -17,6 +17,17 @@ type Student struct {
 	Marks int64
 }
 
+func Add(a int32, b int32) int32 {
+	if a < 1 {
+		return -a
+
+	}
+	if b < 1 {
+		return -b
+	}
+	return a + b
+}
+
 // main function
 func main() {
 
@@ -28,7 +39,6 @@ func main() {
 	tmp1 := template.New("Template_1")
 
 	// "Parse" parses a string into a template
-	tmp1, _ = tmp1.Parse("Hello {{.Name}}, your marks are {{.Marks}}%!")
 	tmp1, _ = tmp1.Parse("Hello {{.Name}}, your marks are {{.Marks}}%!")
 
 	// standard output to print merged data
