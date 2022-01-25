@@ -14,11 +14,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
-      - name: Config git with private repos
-        env:
-          GO_REPO_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
-        run: |
-          git config --global url."https://${GO_REPO_TOKEN}:x-oauth-basic@github.com/".insteadOf https://github.com/
       - uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
@@ -27,10 +22,6 @@ jobs:
             ${{ runner.os }}-go-
       - name: Install dependencies
         run: go mod tidy
-      - name: formatting branch name
-        shell: bash
-        run: |
-          echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
       - name: Run test with coverage
         run: |
           go test -p 1 -v -coverprofile coverage.out ./...
@@ -55,5 +46,4 @@ jobs:
             -Dsonar.go.coverage.reportPaths=coverage.out
             -Dsonar.verbose=true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
