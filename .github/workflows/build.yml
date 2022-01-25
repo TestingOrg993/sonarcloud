@@ -41,7 +41,8 @@ jobs:
             -Dsonar.language=go
             -Dsonar.sources=.
             -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.tests=.
+            -Dsonar.exclusions=**/*_test.go,.git/**,coverage.html,cover.html,main.go,build/**
+            -Dsonar.test.inclusions=/**/*_test.go
             -Dsonar.go.tests.reportPaths=report.json
             -Dsonar.go.coverage.reportPaths=coverage.out
             -Dsonar.verbose=true
