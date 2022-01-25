@@ -6,45 +6,15 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  test:
+  sonarcloud:
+    name: SonarCloud
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v2
         with:
-          go-version: 1.17
-      - uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Install dependencies
-        run: go mod tidy
-      - name: Run test with coverage
-        run: |
-          go test -p 1 -v -coverprofile coverage.out ./...
-          go tool cover -html=coverage.out -o coverage.html
-      - name: Upload test coverage to artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          path: ${{ github.workspace }}/coverage.html
-          name: ${{ runner.os }}-${{ env.BRANCH_NAME }}-coverage
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.projectKey=TestingOrg993_sonarcloud
-            -Dsonar.organization=testingorg993
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.language=go
-            -Dsonar.sources=.
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.exclusions=**/*_test.go,.git/**,coverage.html,cover.html,build/**
-            -Dsonar.test.inclusions=/**/*_test.go
-            -Dsonar.go.tests.reportPaths=report.json
-            -Dsonar.go.coverage.reportPaths=coverage.out
-            -Dsonar.verbose=true
+        uses: SonarSource/sonarcloud-github-action@master
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
