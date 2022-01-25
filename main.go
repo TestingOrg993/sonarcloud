@@ -29,6 +29,7 @@ func main() {
 
 	// "Parse" parses a string into a template
 	tmp1, _ = tmp1.Parse("Hello {{.Name}}, your marks are {{.Marks}}%!")
+	tmp1, _ = tmp1.Parse("Hello {{.Name}}, your marks are {{.Marks}}%!")
 
 	// standard output to print merged data
 	err := tmp1.Execute(os.Stdout, std1)
