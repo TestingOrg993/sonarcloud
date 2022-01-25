@@ -17,6 +17,17 @@ type Student struct {
 	Marks int64
 }
 
+func Add(a int32, b int32) int32 {
+	if a < 1 {
+		return -a
+
+	}
+	if b < 1 {
+		return -b
+	}
+	return a + b
+}
+
 // main function
 func main() {
 
