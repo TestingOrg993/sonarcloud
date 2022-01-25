@@ -6,16 +6,54 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+          go-version: 1.16
+      - name: Config git with private repos
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          GO_REPO_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
+        run: |
+          git config --global url."https://${GO_REPO_TOKEN}:x-oauth-basic@github.com/".insteadOf https://github.com/
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install dependencies
+        run: go mod tidy
+      - name: formatting branch name
+        shell: bash
+        run: |
+          echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+      - name: Run test with coverage
+        run: |
+          go test -p 1 -v -coverprofile coverage.out ./...
+          go tool cover -html=coverage.out -o coverage.html
+      - name: Upload test coverage to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ github.workspace }}/coverage.html
+          name: ${{ runner.os }}-${{ env.BRANCH_NAME }}-coverage
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=TestingOrg993_sonarcloud
+            -Dsonar.organization=testingorg993
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.language=go
+            -Dsonar.sources=.
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.tests=.
+            -Dsonar.go.tests.reportPaths=report.json
+            -Dsonar.go.coverage.reportPaths=coverage.out
+            -Dsonar.verbose=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          
