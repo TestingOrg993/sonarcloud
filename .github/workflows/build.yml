@@ -3,58 +3,59 @@ on:
   push:
     branches:
       - main
+      
 jobs:
   test:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v2
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.17
-    - name: Config git with private repos
-      env:
-        GO_REPO_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
-      run: |
-        git config --global url."https://${GO_REPO_TOKEN}:x-oauth-basic@github.com/".insteadOf https://github.com/
-    - uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Install dependencies
-      run: go mod tidy
-    - name: Run test with coverage
-      run: |
-        go test -p 1 -v -coverprofile cover.out ./...
-        go test -p 1 -json ./... > report.json
-        go tool cover -html=cover.out -o cover.html
-    - name: formatting branch name
-      shell: bash
-      run: |
-        echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
-    - name: Upload test coverage to artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        path: ${{ github.workspace }}/cover.html
-        name: ${{ runner.os }}-${{ github.head_ref }}-coverage
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      with:
-        args: >
-          -Dsonar.projectKey=TestingOrg993_sonarcloud
-          -Dsonar.organization=testingorg993
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.language=go
-          -Dsonar.sources=.
-          -Dsonar.sourceEncoding=UTF-8
-          -Dsonar.exclusions=**/*_test.go,.git/**,cover.html
-          -Dsonar.test.inclusions=/**/*_test.go
-          -Dsonar.go.tests.reportPaths=report.json
-          -Dsonar.go.coverage.reportPaths=cover.out
-          -Dsonar.coverage.exclusions=main.go,internal/service.go,internal/trace.go
-          -Dsonar.verbose=true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Config git with private repos
+        env:
+          GO_REPO_TOKEN: ${{ secrets.GO_REPO_TOKEN }}
+        run: |
+          git config --global url."https://${GO_REPO_TOKEN}:x-oauth-basic@github.com/".insteadOf https://github.com/
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Run test with coverage
+        run: |
+          go test -p 1 -v -coverprofile cover.out ./...
+          go test -p 1 -json ./... > report.json
+          go tool cover -html=cover.out -o cover.html
+      - name: formatting branch name
+        shell: bash
+        run: |
+          echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+      - name: Upload test coverage to artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          path: ${{ github.workspace }}/cover.html
+          name: ${{ runner.os }}-${{ github.head_ref }}-coverage
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=TestingOrg993_sonarcloud
+            -Dsonar.organization=testingorg993
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.language=go
+            -Dsonar.sources=.
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.exclusions=**/*_test.go,.git/**,cover.html
+            -Dsonar.test.inclusions=/**/*_test.go
+            -Dsonar.go.tests.reportPaths=report.json
+            -Dsonar.go.coverage.reportPaths=cover.out
+            -Dsonar.coverage.exclusions=main.go,internal/service.go,internal/trace.go
+            -Dsonar.verbose=true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
