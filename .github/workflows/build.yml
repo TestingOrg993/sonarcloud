@@ -52,7 +52,7 @@ jobs:
             -Dsonar.test.inclusions=/**/*_test.go
             -Dsonar.go.tests.reportPaths=report.json
             -Dsonar.go.coverage.reportPaths=cover.out
-            -Dsonar.coverage.exclusions=main.go,internal/service.go,internal/trace.go
+            -Dsonar.coverage.exclusions=main.go
             -Dsonar.verbose=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
