@@ -40,20 +40,6 @@ jobs:
           name: ${{ runner.os }}-${{ github.head_ref }}-coverage
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        with:
-          args: >
-            -Dsonar.projectKey=TestingOrg993_sonarcloud
-            -Dsonar.organization=testingorg993
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.language=go
-            -Dsonar.sources=.
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.exclusions=**/*_test.go,.git/**,cover.html
-            -Dsonar.test.inclusions=/**/*_test.go
-            -Dsonar.go.tests.reportPaths=report.json
-            -Dsonar.go.coverage.reportPaths=cover.out
-            -Dsonar.coverage.exclusions=main.go
-            -Dsonar.verbose=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
