@@ -19,12 +19,6 @@ func TestAdd(t *testing.T) {
 			argsb: 30,
 			want:  50,
 		},
-		{
-			name:  "a minus",
-			argsa: -3,
-			argsb: 30,
-			want:  3,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
