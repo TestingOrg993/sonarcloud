@@ -55,8 +55,6 @@ jobs:
             -Dsonar.exclusions=**/*_test.go,.git/**,cover.html
             -Dsonar.tests=.
             -Dsonar.test.inclusions=/**/*_test.go
-            -Dsonar.go.tests.reportPaths=report.json
-            -Dsonar.go.coverage.reportPaths=cover.out
             -Dsonar.coverage.exclusions=main.go
             -Dsonar.verbose=true
         env:
