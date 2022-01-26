@@ -52,7 +52,6 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.language=go
             -Dsonar.sources=.
-            -Dsonar.sourceEncoding=UTF-8
             -Dsonar.exclusions=**/*_test.go,.git/**,cover.html
             -Dsonar.tests=.
             -Dsonar.test.inclusions=/**/*_test.go
